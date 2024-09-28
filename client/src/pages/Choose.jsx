@@ -6,7 +6,6 @@ import RestaurantCard from "../components/RestaurantCard";
 const shuffleArray = (array) => {
   let currentIndex = array.length,
     randomIndex;
-
   while (currentIndex !== 0) {
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
@@ -18,98 +17,71 @@ const shuffleArray = (array) => {
   return array;
 };
 
-// Cities list to randomize each time
+// Cities list
 const cities = ["Atlanta", "Sandy Springs", "Duluth", "Alpharetta", "Marietta"];
 
 function Choose() {
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [restaurants, setRestaurants] = useState([]);
   const [error, setError] = useState(null);
-  const [displayedIds, setDisplayedIds] = useState(new Set()); // Track displayed restaurant IDs
+  const [clickCount, setClickCount] = useState(0); // Track number of clicks
 
-  // Function to get a random city from the cities array
+  // Function to get a random city
   function getRandomCity() {
     return cities[Math.floor(Math.random() * cities.length)];
   }
 
-  // Fetch restaurants from a specific city
-  const fetchRestaurantsFromCity = async (city) => {
+  // Fetch 12 unique restaurants from random cities and shuffle them
+  const fetchRestaurants = async () => {
     const categories =
       "italian,french,steakhouses,seafood,winebars,mediterranean,cocktailbars,nightlife,mexican,pizza,korean,japanese";
     const limit = 50;
+    let allRestaurants = [];
 
-    try {
+    // Fetch restaurants from all cities
+    for (let i = 0; i < cities.length; i++) {
+      const city = getRandomCity();
       const apiUrl = `${
         process.env.REACT_APP_API_URL
       }/api/yelp?location=${encodeURIComponent(
         city
       )}&categories=${encodeURIComponent(categories)}&limit=${limit}`;
 
-      const response = await fetch(apiUrl);
-      if (!response.ok) throw new Error(`Network error: ${response.status}`);
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error(`Network error: ${response.status}`);
 
-      const data = await response.json();
-      const restaurantData = data.businesses || [];
-      return restaurantData;
-    } catch (error) {
-      console.error("Error fetching restaurants:", error);
-      setError("Failed to fetch restaurants. Please try again later.");
-      return [];
+        const data = await response.json();
+        const restaurantData = data.businesses || [];
+
+        // Add to the overall restaurant pool
+        allRestaurants = [...allRestaurants, ...restaurantData];
+      } catch (error) {
+        console.error("Error fetching restaurants:", error);
+        setError("Failed to fetch restaurants. Please try again later.");
+      }
     }
-  };
 
-  // Initial fetch to populate the restaurants list
-  const fetchInitialRestaurants = async () => {
-    setLoading(true);
-    const city = getRandomCity();
-    const initialRestaurants = await fetchRestaurantsFromCity(city);
-
-    // Shuffle and limit to 20 unique restaurants
-    const uniqueRestaurants = initialRestaurants.filter(
-      (restaurant) => !displayedIds.has(restaurant.id)
-    );
-
-    const shuffledRestaurants = shuffleArray(uniqueRestaurants).slice(0, 20);
+    // Shuffle and take 12 unique restaurants
+    const shuffledRestaurants = shuffleArray(allRestaurants).slice(0, 12);
     setRestaurants(shuffledRestaurants);
     setLoading(false);
-
-    // Add the new restaurant IDs to displayedIds
-    shuffledRestaurants.forEach((restaurant) =>
-      displayedIds.add(restaurant.id)
-    );
   };
 
-  // Fetch a new restaurant from a random city and replace the unclicked restaurant
-  const replaceUnclickedRestaurant = async (clickedIndex) => {
-    const newCity = getRandomCity();
-    const newRestaurants = await fetchRestaurantsFromCity(newCity);
-
-    // Filter out any restaurants that have already been displayed
-    const uniqueNewRestaurants = newRestaurants.filter(
-      (restaurant) => !displayedIds.has(restaurant.id)
-    );
-
-    if (uniqueNewRestaurants.length > 0) {
-      const newRestaurant = uniqueNewRestaurants[0]; // Grab the first unique restaurant
-
-      // Determine the opposite restaurant to replace
-      const oppositeIndex = clickedIndex === 0 ? restaurants.length - 1 : 0;
-
+  // Handle click and remove one restaurant at a time
+  const handleClick = (index) => {
+    if (restaurants.length > 1) {
       setRestaurants((prevRestaurants) => {
         const updatedRestaurants = [...prevRestaurants];
-        updatedRestaurants[oppositeIndex] = newRestaurant; // Replace the unclicked restaurant
+        updatedRestaurants.splice(index === 0 ? restaurants.length - 1 : 0, 1); // Remove the unclicked restaurant
         return updatedRestaurants;
       });
-
-      // Add the new restaurant ID to displayedIds
-      displayedIds.add(newRestaurant.id);
-    } else {
-      console.log("No unique restaurants found in the new city.");
+      setClickCount((prevCount) => prevCount + 1); // Increment click count
     }
   };
 
   useEffect(() => {
-    fetchInitialRestaurants(); // Fetch initial restaurants when component mounts
+    fetchRestaurants(); // Fetch 12 unique restaurants when the component mounts
   }, []);
 
   const redirect = (url) => {
@@ -135,14 +107,14 @@ function Choose() {
           <RestaurantCard
             restaurant={restaurants[0]}
             onClick={() => {
-              replaceUnclickedRestaurant(0); // Replace the unclicked restaurant
+              handleClick(0); // Handle click for first restaurant
             }}
           />
           <h1 className="text-4xl font-black text-white">OR</h1>
           <RestaurantCard
             restaurant={restaurants[restaurants.length - 1]}
             onClick={() => {
-              replaceUnclickedRestaurant(restaurants.length - 1); // Replace the unclicked restaurant
+              handleClick(restaurants.length - 1); // Handle click for last restaurant
             }}
           />
         </div>
@@ -156,7 +128,7 @@ function Choose() {
             <RestaurantCard
               restaurant={restaurants[0]}
               onClick={() => {
-                redirect(restaurants[0].url);
+                redirect(restaurants[0].url); // Redirect to the winner's page
               }}
             />
           </div>
