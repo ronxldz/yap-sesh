@@ -137,7 +137,7 @@ function Choose() {
 
           {/* Play Again Button */}
           <button
-            className="px-8 py-4 bg-white text-red-500 font-bold rounded-full shadow-lg transition-transform hover:scale-105"
+            className="px-24 py-4 bg-white text-2xl font-bold text-red-300 rounded-full shadow-sm transition-shadow duration-300 hover:shadow-lg"
             onClick={() => navigate("/")}>
             Play Again
           </button>
