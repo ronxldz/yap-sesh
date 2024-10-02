@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Confetti from "react-confetti";
 import RestaurantCard from "../components/RestaurantCard";
 
@@ -25,6 +26,7 @@ function Choose() {
   const [restaurants, setRestaurants] = useState([]);
   const [error, setError] = useState(null);
   const [clickCount, setClickCount] = useState(0); // Track number of clicks
+  const navigate = useNavigate(); // For navigation
 
   // Function to get a random city
   function getRandomCity() {
@@ -132,6 +134,13 @@ function Choose() {
               }}
             />
           </div>
+
+          {/* Play Again Button */}
+          <button
+            className="px-8 py-4 bg-white text-red-500 font-bold rounded-full shadow-lg transition-transform hover:scale-105"
+            onClick={() => navigate("/")}>
+            Play Again
+          </button>
         </div>
       )}
     </div>
