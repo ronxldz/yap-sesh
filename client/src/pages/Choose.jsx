@@ -33,7 +33,7 @@ function Choose() {
   const [loading, setLoading] = useState(true);
   const [restaurants, setRestaurants] = useState([]);
   const [error, setError] = useState(null);
-  const [clickCount, setClickCount] = useState(0);
+  const [, setClickCount] = useState(0);
   const navigate = useNavigate();
 
   const fetchRestaurants = async () => {
