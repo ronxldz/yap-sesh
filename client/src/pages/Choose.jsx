@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Confetti from "react-confetti";
 import RestaurantCard from "../components/RestaurantCard";
 
-// Function to shuffle the array (Fisher-Yates Shuffle Algorithm)
 const shuffleArray = (array) => {
   let currentIndex = array.length,
     randomIndex;
@@ -18,89 +17,81 @@ const shuffleArray = (array) => {
   return array;
 };
 
-// Cities list
-const cities = ["Atlanta", "Sandy Springs", "Duluth", "Alpharetta", "Marietta"];
+const cities = [
+  "Atlanta",
+  "Sandy Springs",
+  "Duluth",
+  "Alpharetta",
+  "Marietta",
+  "Suwanee",
+  "Johns Creek",
+  "Norcross",
+  "Doraville",
+];
 
 function Choose() {
   const [loading, setLoading] = useState(true);
   const [restaurants, setRestaurants] = useState([]);
   const [error, setError] = useState(null);
-  const [clickCount, setClickCount] = useState(0); // Track number of clicks
-  const navigate = useNavigate(); // For navigation
+  const [clickCount, setClickCount] = useState(0);
+  const navigate = useNavigate();
 
-  // Function to get a random city
-  function getRandomCity() {
-    return cities[Math.floor(Math.random() * cities.length)];
-  }
-
-  // Fetch 12 unique restaurants from random cities and shuffle them
   const fetchRestaurants = async () => {
     const categories =
       "italian,french,steakhouses,seafood,winebars,mediterranean,cocktailbars,nightlife,mexican,pizza,korean,japanese";
-    const limit = 50;
-    let allRestaurants = [];
+    const limit = 5;
 
-    // Fetch restaurants from all cities
-    for (let i = 0; i < cities.length; i++) {
-      const city = getRandomCity();
-      const apiUrl = `${
-        process.env.REACT_APP_API_URL
-      }/api/yelp?location=${encodeURIComponent(
-        city
-      )}&categories=${encodeURIComponent(categories)}&limit=${limit}`;
+    const shuffledCities = shuffleArray([...cities]).slice(0, 6);
 
-      try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Network error: ${response.status}`);
+    const fetchPromises = shuffledCities.map((city) => {
+      const apiUrl = `${process.env.REACT_APP_API_URL}/api/yelp?location=${encodeURIComponent(city)}&categories=${encodeURIComponent(categories)}&limit=${limit}`;
+      return fetch(apiUrl)
+        .then((res) => res.json())
+        .then((data) => data.businesses || [])
+        .catch(() => []);
+    });
 
-        const data = await response.json();
-        const restaurantData = data.businesses || [];
+    const results = await Promise.all(fetchPromises);
+    const allRestaurants = results.flat();
 
-        // Add to the overall restaurant pool
-        allRestaurants = [...allRestaurants, ...restaurantData];
-      } catch (error) {
-        console.error("Error fetching restaurants:", error);
-        setError("Failed to fetch restaurants. Please try again later.");
-      }
+    if (allRestaurants.length === 0) {
+      setError("Failed to fetch restaurants. Please try again later.");
+    } else {
+      const shuffled = shuffleArray(allRestaurants).slice(0, 12);
+      setRestaurants(shuffled);
     }
-
-    // Shuffle and take 12 unique restaurants
-    const shuffledRestaurants = shuffleArray(allRestaurants).slice(0, 12);
-    setRestaurants(shuffledRestaurants);
     setLoading(false);
   };
 
-  // Handle click and remove one restaurant at a time
   const handleClick = (index) => {
     if (restaurants.length > 1) {
       setRestaurants((prevRestaurants) => {
         const updatedRestaurants = [...prevRestaurants];
-        updatedRestaurants.splice(index === 0 ? restaurants.length - 1 : 0, 1); // Remove the unclicked restaurant
+        updatedRestaurants.splice(index === 0 ? restaurants.length - 1 : 0, 1);
         return updatedRestaurants;
       });
-      setClickCount((prevCount) => prevCount + 1); // Increment click count
+      setClickCount((prevCount) => prevCount + 1);
     }
   };
 
   useEffect(() => {
-    fetchRestaurants(); // Fetch 12 unique restaurants when the component mounts
+    fetchRestaurants();
   }, []);
 
   const redirect = (url) => {
     window.open(url, "_blank");
   };
 
-  if (loading) {
-    return <div>Loading...</div>; // Add a loading indicator
-  }
-
-  if (error) {
-    return <div className="error-message">{error}</div>; // Display error message
-  }
-
-  if (restaurants.length === 0) {
-    return <div>No restaurants found.</div>; // Display no results message
-  }
+  if (loading)
+    return (
+      <div className="flex justify-center items-center w-full min-h-screen bg-red-200">
+        <h1 className="text-4xl font-black text-white animate-pulse">
+          Finding restaurants...
+        </h1>
+      </div>
+    );
+  if (error) return <div className="error-message">{error}</div>;
+  if (restaurants.length === 0) return <div>No restaurants found.</div>;
 
   return (
     <div className="flex flex-col justify-center items-center w-full min-h-screen bg-red-200 gap-8 p-4">
@@ -108,16 +99,12 @@ function Choose() {
         <div className="flex flex-col sm:flex-row justify-center items-center w-full gap-8 sm:gap-16">
           <RestaurantCard
             restaurant={restaurants[0]}
-            onClick={() => {
-              handleClick(0); // Handle click for first restaurant
-            }}
+            onClick={() => handleClick(0)}
           />
           <h1 className="text-4xl font-black text-white">OR</h1>
           <RestaurantCard
             restaurant={restaurants[restaurants.length - 1]}
-            onClick={() => {
-              handleClick(restaurants.length - 1); // Handle click for last restaurant
-            }}
+            onClick={() => handleClick(restaurants.length - 1)}
           />
         </div>
       ) : (
@@ -129,13 +116,9 @@ function Choose() {
           <div className="flex justify-center items-center w-full">
             <RestaurantCard
               restaurant={restaurants[0]}
-              onClick={() => {
-                redirect(restaurants[0].url); // Redirect to the winner's page
-              }}
+              onClick={() => redirect(restaurants[0].url)}
             />
           </div>
-
-          {/* Play Again Button */}
           <button
             className="px-24 py-4 bg-white text-2xl font-bold text-red-300 rounded-full shadow-sm transition-shadow duration-300 hover:shadow-lg"
             onClick={() => navigate("/")}>
