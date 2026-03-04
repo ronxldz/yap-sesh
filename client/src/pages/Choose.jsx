@@ -45,11 +45,11 @@ function Choose() {
     //   "italian,french,steakhouses,seafood,winebars,mediterranean,cocktailbars,nightlife,mexican,pizza,korean,japanese";
 
     // CAFES / MATCHA MODE (comment out when using restaurants)
-    const categories = "coffee,cafes,tea";
+    const categories = "coffee,cafes,tea,bubbletea";
 
     const limit = 5;
 
-    const shuffledCities = shuffleArray([...cities]).slice(0, 6);
+    const shuffledCities = shuffleArray([...cities]).slice(0, 9);
 
     const fetchPromises = shuffledCities.map((city) => {
       const apiUrl = `${process.env.REACT_APP_API_URL}/api/yelp?location=${encodeURIComponent(city)}&categories=${encodeURIComponent(categories)}&limit=${limit}`;
@@ -93,6 +93,8 @@ function Choose() {
       "bistro",
       "steakhouse",
       "italian",
+      "tap",
+      "beer",
     ];
 
     const filteredRestaurants = allRestaurants.filter((restaurant) => {
@@ -102,11 +104,18 @@ function Choose() {
       const hasMatcha = matchaNameKeywords.some((keyword) =>
         name.includes(keyword),
       );
+      const isCafe = [
+        "coffee",
+        "cafes",
+        "tea",
+        "bubbletea",
+        "coffeeroasteries",
+      ].some((keyword) => cats.includes(keyword));
       const isFood = excludeKeywords.some(
         (keyword) => name.includes(keyword) || cats.includes(keyword),
       );
 
-      return hasMatcha && !isFood;
+      return (hasMatcha || isCafe) && !isFood;
     });
 
     // RESTAURANTS MODE: swap filteredRestaurants -> allRestaurants
