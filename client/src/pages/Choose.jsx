@@ -37,8 +37,9 @@ function Choose() {
   const navigate = useNavigate();
 
   const fetchRestaurants = async () => {
-    const categories =
-      "italian,french,steakhouses,seafood,winebars,mediterranean,cocktailbars,nightlife,mexican,pizza,korean,japanese";
+    // const categories =
+    //   "italian,french,steakhouses,seafood,winebars,mediterranean,cocktailbars,nightlife,mexican,pizza,korean,japanese";
+    const categories = "coffee,cafes,tea";
     const limit = 5;
 
     const shuffledCities = shuffleArray([...cities]).slice(0, 6);
