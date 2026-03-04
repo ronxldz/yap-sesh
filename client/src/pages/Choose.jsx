@@ -61,20 +61,44 @@ function Choose() {
     const allRestaurants = results.flat();
 
     // MATCHA FILTER (only active in cafes mode, comment out for restaurants mode)
-    const matchaKeywords = [
+    const matchaNameKeywords = [
       "matcha",
-      "tea",
-      "cafe",
-      "coffee",
+      "milk tea",
       "boba",
-      "japanese",
+      "tea house",
+      "teahouse",
+      "cha",
+      "ocha",
+      "japanese tea",
     ];
+    const excludeKeywords = [
+      "restaurant",
+      "grill",
+      "bbq",
+      "burger",
+      "pizza",
+      "sushi",
+      "ramen",
+      "pho",
+      "wings",
+      "kitchen",
+      "diner",
+      "bistro",
+      "steakhouse",
+    ];
+
     const filteredRestaurants = allRestaurants.filter((restaurant) => {
       const name = restaurant.name.toLowerCase();
       const cats = restaurant.categories.map((c) => c.alias).join(" ");
-      return matchaKeywords.some(
+
+      const hasMatcha = matchaNameKeywords.some((keyword) =>
+        name.includes(keyword),
+      );
+      const isFood = excludeKeywords.some(
         (keyword) => name.includes(keyword) || cats.includes(keyword),
       );
+
+      return hasMatcha && !isFood;
     });
 
     // RESTAURANTS MODE: swap filteredRestaurants -> allRestaurants
