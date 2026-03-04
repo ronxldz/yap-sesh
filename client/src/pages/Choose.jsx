@@ -22,11 +22,12 @@ const cities = [
   "Sandy Springs",
   "Duluth",
   "Alpharetta",
-  "Marietta",
+  "Lawrenceville",
   "Suwanee",
   "Johns Creek",
   "Norcross",
   "Doraville",
+  "Chamblee",
 ];
 
 function Choose() {
@@ -37,9 +38,13 @@ function Choose() {
   const navigate = useNavigate();
 
   const fetchRestaurants = async () => {
+    // RESTAURANTS MODE (comment out when using cafes)
     // const categories =
     //   "italian,french,steakhouses,seafood,winebars,mediterranean,cocktailbars,nightlife,mexican,pizza,korean,japanese";
+
+    // CAFES / MATCHA MODE (comment out when using restaurants)
     const categories = "coffee,cafes,tea";
+
     const limit = 5;
 
     const shuffledCities = shuffleArray([...cities]).slice(0, 6);
@@ -55,10 +60,28 @@ function Choose() {
     const results = await Promise.all(fetchPromises);
     const allRestaurants = results.flat();
 
-    if (allRestaurants.length === 0) {
+    // MATCHA FILTER (only active in cafes mode, comment out for restaurants mode)
+    const matchaKeywords = [
+      "matcha",
+      "tea",
+      "cafe",
+      "coffee",
+      "boba",
+      "japanese",
+    ];
+    const filteredRestaurants = allRestaurants.filter((restaurant) => {
+      const name = restaurant.name.toLowerCase();
+      const cats = restaurant.categories.map((c) => c.alias).join(" ");
+      return matchaKeywords.some(
+        (keyword) => name.includes(keyword) || cats.includes(keyword),
+      );
+    });
+
+    // RESTAURANTS MODE: swap filteredRestaurants -> allRestaurants
+    if (filteredRestaurants.length === 0) {
       setError("Failed to fetch restaurants. Please try again later.");
     } else {
-      const shuffled = shuffleArray(allRestaurants).slice(0, 12);
+      const shuffled = shuffleArray(filteredRestaurants).slice(0, 12);
       setRestaurants(shuffled);
     }
     setLoading(false);
