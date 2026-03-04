@@ -137,17 +137,17 @@ function Choose() {
   const redirect = (url) => {
     window.open(url, "_blank");
   };
-
+  //Change to Rsturaunts when using restaurant mode, and Cafes when using cafe mode
   if (loading)
     return (
       <div className="flex justify-center items-center w-full min-h-screen bg-red-200">
         <h1 className="text-4xl font-black text-white animate-pulse">
-          Finding restaurants...
+          Finding Matcha...
         </h1>
       </div>
     );
   if (error) return <div className="error-message">{error}</div>;
-  if (restaurants.length === 0) return <div>No restaurants found.</div>;
+  if (restaurants.length === 0) return <div>No Matcha shops found.</div>;
 
   return (
     <div className="flex flex-col justify-center items-center w-full min-h-screen bg-red-200 gap-8 p-4">
