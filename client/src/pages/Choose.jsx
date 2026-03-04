@@ -28,6 +28,8 @@ const cities = [
   "Norcross",
   "Doraville",
   "Chamblee",
+  "Dunwoody",
+  "Tucker",
 ];
 
 function Choose() {
@@ -70,6 +72,11 @@ function Choose() {
       "cha",
       "ocha",
       "japanese tea",
+      "matcha latte",
+      "green tea",
+      "iced matcha",
+      "Matcha",
+      "bakery",
     ];
     const excludeKeywords = [
       "restaurant",
@@ -85,6 +92,7 @@ function Choose() {
       "diner",
       "bistro",
       "steakhouse",
+      "italian",
     ];
 
     const filteredRestaurants = allRestaurants.filter((restaurant) => {
