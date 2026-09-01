@@ -41,11 +41,11 @@ function Choose() {
 
   const fetchRestaurants = async () => {
     // RESTAURANTS MODE (comment out when using cafes)
-    // const categories =
-    //   "italian,french,steakhouses,seafood,winebars,mediterranean,cocktailbars,nightlife,mexican,pizza,korean,japanese";
+    const categories =
+      "italian,french,steakhouses,seafood,winebars,mediterranean,cocktailbars,nightlife,mexican,pizza,korean,japanese";
 
     // CAFES / MATCHA MODE (comment out when using restaurants)
-    const categories = "coffee,cafes,tea,bubbletea";
+    // const categories = "coffee,cafes,tea,bubbletea";
 
     const limit = 5;
 
@@ -63,39 +63,39 @@ function Choose() {
     const allRestaurants = results.flat();
 
     // MATCHA FILTER (only active in cafes mode, comment out for restaurants mode)
-    const matchaNameKeywords = [
-      "matcha",
-      "milk tea",
-      "boba",
-      "tea house",
-      "teahouse",
-      "cha",
-      "ocha",
-      "japanese tea",
-      "matcha latte",
-      "green tea",
-      "iced matcha",
-      "Matcha",
-      "bakery",
-    ];
-    const excludeKeywords = [
-      "restaurant",
-      "grill",
-      "bbq",
-      "burger",
-      "pizza",
-      "sushi",
-      "ramen",
-      "pho",
-      "wings",
-      "kitchen",
-      "diner",
-      "bistro",
-      "steakhouse",
-      "italian",
-      "tap",
-      "beer",
-    ];
+    // const matchaNameKeywords = [
+    //   "matcha",
+    //   "milk tea",
+    //   "boba",
+    //   "tea house",
+    //   "teahouse",
+    //   "cha",
+    //   "ocha",
+    //   "japanese tea",
+    //   "matcha latte",
+    //   "green tea",
+    //   "iced matcha",
+    //   "Matcha",
+    //   "bakery",
+    // ];
+    // const excludeKeywords = [
+    //   "restaurant",
+    //   "grill",
+    //   "bbq",
+    //   "burger",
+    //   "pizza",
+    //   "sushi",
+    //   "ramen",
+    //   "pho",
+    //   "wings",
+    //   "kitchen",
+    //   "diner",
+    //   "bistro",
+    //   "steakhouse",
+    //   "italian",
+    //   "tap",
+    //   "beer",
+    // ];
 
     const filteredRestaurants = allRestaurants.filter((restaurant) => {
       const name = restaurant.name.toLowerCase();
@@ -119,10 +119,10 @@ function Choose() {
     });
 
     // RESTAURANTS MODE: swap filteredRestaurants -> allRestaurants
-    if (filteredRestaurants.length === 0) {
+    if (allRestaurants.length === 0) {
       setError("Failed to fetch restaurants. Please try again later.");
     } else {
-      const shuffled = shuffleArray(filteredRestaurants).slice(0, 12);
+      const shuffled = shuffleArray(allRestaurants).slice(0, 12);
       setRestaurants(shuffled);
     }
     setLoading(false);
@@ -151,12 +151,12 @@ function Choose() {
     return (
       <div className="flex justify-center items-center w-full min-h-screen bg-red-200">
         <h1 className="text-4xl font-black text-white animate-pulse">
-          Finding Matcha...
+          Finding Restaurants...
         </h1>
       </div>
     );
   if (error) return <div className="error-message">{error}</div>;
-  if (restaurants.length === 0) return <div>No Matcha shops found.</div>;
+  if (restaurants.length === 0) return <div>No restaurants found.</div>;
 
   return (
     <div className="flex flex-col justify-center items-center w-full min-h-screen bg-red-200 gap-8 p-4">
