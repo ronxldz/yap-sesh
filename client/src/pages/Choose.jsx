@@ -19,6 +19,8 @@ const shuffleArray = (array) => {
 
 const cities = [
   "Atlanta",
+  "Midtown, Atlanta",
+  "Buckhead, Atlanta",
   "Sandy Springs",
   "Duluth",
   "Alpharetta",
