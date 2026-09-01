@@ -31,6 +31,22 @@ const cities = [
   "Dunwoody",
   "Tucker",
 ];
+// How many cities to fetch at once, and how long to pause between batches.
+const CHUNK_SIZE = 3;
+const CHUNK_DELAY_MS = 350;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Fetches a Yelp URL, retrying once if Yelp returns 429 (Too Many Requests).
+const fetchWithRetry = async (url, retries = 1) => {
+  const res = await fetch(url);
+  if (res.status === 429 && retries > 0) {
+    const retryAfter = Number(res.headers.get("Retry-After")) || 1;
+    await sleep(retryAfter * 1000);
+    return fetchWithRetry(url, retries - 1);
+  }
+  return res.json().catch(() => ({}));
+};
 
 function Choose() {
   const [loading, setLoading] = useState(true);
@@ -51,16 +67,28 @@ function Choose() {
 
     const shuffledCities = shuffleArray([...cities]).slice(0, 9);
 
-    const fetchPromises = shuffledCities.map((city) => {
-      const apiUrl = `${process.env.REACT_APP_API_URL}/api/yelp?location=${encodeURIComponent(city)}&categories=${encodeURIComponent(categories)}&limit=${limit}`;
-      return fetch(apiUrl)
-        .then((res) => res.json())
-        .then((data) => data.businesses || [])
-        .catch(() => []);
-    });
+    const allRestaurants = [];
 
-    const results = await Promise.all(fetchPromises);
-    const allRestaurants = results.flat();
+    for (let i = 0; i < shuffledCities.length; i += CHUNK_SIZE) {
+      const chunk = shuffledCities.slice(i, i + CHUNK_SIZE);
+
+      const chunkResults = await Promise.all(
+        chunk.map((city) => {
+          const apiUrl = `${process.env.REACT_APP_API_URL}/api/yelp?location=${encodeURIComponent(
+            city,
+          )}&categories=${encodeURIComponent(categories)}&limit=${limit}`;
+          return fetchWithRetry(apiUrl)
+            .then((data) => data.businesses || [])
+            .catch(() => []);
+        }),
+      );
+
+      allRestaurants.push(...chunkResults.flat());
+
+      if (i + CHUNK_SIZE < shuffledCities.length) {
+        await sleep(CHUNK_DELAY_MS);
+      }
+    }
 
     // MATCHA FILTER (only active in cafes mode, comment out for restaurants mode)
     // const matchaNameKeywords = [
