@@ -13,7 +13,7 @@ function Home() {
             alt="logo"
           />
           <h1 className="text-5xl sm:text-8xl font-black text-white uppercase">
-            Yums
+            Antojos
           </h1>
         </div>
 
