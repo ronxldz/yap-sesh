@@ -97,26 +97,26 @@ function Choose() {
     //   "beer",
     // ];
 
-    const filteredRestaurants = allRestaurants.filter((restaurant) => {
-      const name = restaurant.name.toLowerCase();
-      const cats = restaurant.categories.map((c) => c.alias).join(" ");
+    // const filteredRestaurants = allRestaurants.filter((restaurant) => {
+    //   const name = restaurant.name.toLowerCase();
+    //   const cats = restaurant.categories.map((c) => c.alias).join(" ");
 
-      const hasMatcha = matchaNameKeywords.some((keyword) =>
-        name.includes(keyword),
-      );
-      const isCafe = [
-        "coffee",
-        "cafes",
-        "tea",
-        "bubbletea",
-        "coffeeroasteries",
-      ].some((keyword) => cats.includes(keyword));
-      const isFood = excludeKeywords.some(
-        (keyword) => name.includes(keyword) || cats.includes(keyword),
-      );
+    //   const hasMatcha = matchaNameKeywords.some((keyword) =>
+    //     name.includes(keyword),
+    //   );
+    //   const isCafe = [
+    //     "coffee",
+    //     "cafes",
+    //     "tea",
+    //     "bubbletea",
+    //     "coffeeroasteries",
+    //   ].some((keyword) => cats.includes(keyword));
+    //   const isFood = excludeKeywords.some(
+    //     (keyword) => name.includes(keyword) || cats.includes(keyword),
+    //   );
 
-      return (hasMatcha || isCafe) && !isFood;
-    });
+    //   return (hasMatcha || isCafe) && !isFood;
+    // });
 
     // RESTAURANTS MODE: swap filteredRestaurants -> allRestaurants
     if (allRestaurants.length === 0) {
